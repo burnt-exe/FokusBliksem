@@ -7,7 +7,7 @@
 
 > **Weerligfokus vir jou produktiwiteit** - Lightning focus for your productivity
 
-![FokusBliksem Demo](https://via.placeholder.com/800x450)
+![FokusBliksem Demo](https://raw.githubusercontent.com/burnt-exe/FokusBliksem/79b4a8fd55cfdff731eda3a5a79b34bfd67299a2/assets/fokusbliksem-banner-improved.svg)
 
 FokusBliksem is a sleek, futuristic productivity web application designed to help you manage focused work sessions with precision and style. The name combines the Afrikaans words "Fokus" (focus) and "Bliksem" (lightning), reflecting the app's aim to give you lightning-fast focus and productivity.
 
