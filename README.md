@@ -137,12 +137,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-Questions or feedback? Reach out at [your-email@example.com](mailto:your-email@example.com)
+Questions or feedback? Reach out at [info@skunkworks.africa](mailto:infor@skunkworks.afirca)
 
 ---
 
 <div align="center">
-  <img src="https://via.placeholder.com/250x250" alt="FokusBliksem Logo">
+  <img src="https://raw.githubusercontent.com/burnt-exe/FokusBliksem/79b4a8fd55cfdff731eda3a5a79b34bfd67299a2/assets/fokusbliksem-logo-improved.svg" alt="FokusBliksem Logo">
   <p>
     <strong>FokusBliksem</strong> - Kry gefokus. Bly produktief. Tref met presisie.<br>
     <em>(Get focused. Stay productive. Strike with precision.)</em>
