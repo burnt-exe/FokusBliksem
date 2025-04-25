@@ -1,0 +1,73 @@
+<svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Clean, modern background with gradient -->
+  <defs>
+    <linearGradient id="bannerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#030712" />
+      <stop offset="50%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#312E81" />
+    </linearGradient>
+    
+    <filter id="subtleGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <clipPath id="roundedRect">
+      <rect x="0" y="0" width="1200" height="400" rx="8" ry="8" />
+    </clipPath>
+  </defs>
+  
+  <!-- Main Background with subtle texture -->
+  <rect x="0" y="0" width="1200" height="400" fill="url(#bannerGradient)" clip-path="url(#roundedRect)" />
+  
+  <!-- Subtle grid for depth -->
+  <g opacity="0.07">
+    <line x1="0" y1="100" x2="1200" y2="100" stroke="white" stroke-width="1" />
+    <line x1="0" y1="200" x2="1200" y2="200" stroke="white" stroke-width="1" />
+    <line x1="0" y1="300" x2="1200" y2="300" stroke="white" stroke-width="1" />
+    
+    <line x1="300" y1="0" x2="300" y2="400" stroke="white" stroke-width="1" />
+    <line x1="600" y1="0" x2="600" y2="400" stroke="white" stroke-width="1" />
+    <line x1="900" y1="0" x2="900" y2="400" stroke="white" stroke-width="1" />
+  </g>
+  
+  <!-- Accent graphic elements -->
+  <circle cx="200" cy="200" r="120" fill="#1E293B" stroke="#3B82F6" stroke-width="2" opacity="0.7" />
+  <circle cx="200" cy="200" r="90" fill="none" stroke="#6366F1" stroke-width="1" opacity="0.4" />
+  
+  <!-- Modern Lightning Bolt -->
+  <path d="M200,120 L165,190 L195,190 L175,280 L240,190 L210,190 L230,120 Z" 
+        fill="#3B82F6" 
+        stroke="#93C5FD"
+        stroke-width="2"
+        filter="url(#subtleGlow)" />
+  
+  <!-- Subtle accent lines -->
+  <path d="M350,50 L360,70 L375,60 L390,90" stroke="#3B82F6" stroke-width="1.5" opacity="0.4" fill="none" />
+  <path d="M970,330 L990,300 L1005,310 L1025,280" stroke="#3B82F6" stroke-width="1.5" opacity="0.4" fill="none" />
+  
+  <!-- Clean Typography - Main Title -->
+  <text x="700" y="180" 
+        font-family="Arial, sans-serif" 
+        font-weight="900" 
+        font-size="82" 
+        text-anchor="middle" 
+        fill="white">FOKUSBLIKSEM</text>
+  
+  <!-- Tagline with proper spacing -->
+  <text x="700" y="240" 
+        font-family="Arial, sans-serif" 
+        font-weight="400"
+        font-size="28" 
+        letter-spacing="1"
+        text-anchor="middle" 
+        fill="#93C5FD">Weerligfokus vir jou produktiwiteit</text>
+  
+  <!-- Call to Action with proper hierarchy -->
+  <text x="700" y="310" 
+        font-family="Arial, sans-serif" 
+        font-weight="600"
+        font-size="22" 
+        text-anchor="middle" 
+        fill="white">Kry gefokus. Bly produktief. Tref met presisie.</text>
+</svg>

@@ -1,0 +1,39 @@
+<svg viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with modern gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#312E81" />
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="textShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  
+  <!-- Clean circular background -->
+  <circle cx="125" cy="125" r="115" fill="url(#bgGradient)" />
+  
+  <!-- Modern Lightning Bolt Design -->
+  <path d="M125,50 L90,125 L120,125 L100,200 L160,125 L130,125 L150,50 Z" 
+        fill="#3B82F6" 
+        stroke="#93C5FD"
+        stroke-width="2"
+        filter="url(#glow)" />
+  
+  <!-- Subtle power indicator rings -->
+  <circle cx="125" cy="125" r="80" fill="none" stroke="#6366F1" stroke-width="1.5" stroke-opacity="0.3" />
+  <circle cx="125" cy="125" r="60" fill="none" stroke="#6366F1" stroke-width="1.5" stroke-opacity="0.5" />
+  
+  <!-- Clean, modern typography -->
+  <text x="125" y="225" 
+        font-family="Arial, sans-serif" 
+        font-weight="bold" 
+        font-size="24" 
+        text-anchor="middle" 
+        fill="white"
+        filter="url(#textShadow)">FOKUSBLIKSEM</text>
+</svg>
