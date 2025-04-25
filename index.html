@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FokusBliksem - Lightning Focus for Productivity</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712;
+            color: white;
+            overflow-x: hidden;
+        }
+        .gradient-bg {
+            background: linear-gradient(to bottom right, #0F172A, #1E293B, #312E81);
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        .focus-block {
+            transition: all 0.3s ease;
+        }
+        .focus-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+        }
+        .glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        .lightning-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .lightning-btn:before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0) 0%, rgba(59, 130, 246, 0.8) 50%, rgba(59, 130, 246, 0) 100%);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+        .lightning-btn:hover:before {
+            top: -50%;
+            left: -50%;
+            opacity: 1;
+        }
+        .lightning-btn:hover {
+            transform: translateY(-2px);
+        }
+        .timer-text {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+        }
+        
+        /* Favicon */
+        link[rel="icon"] {
+            border-radius: 50%;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-slow {
+            animation: pulse 3s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Favicon (dynamically set via JavaScript) -->
+    <script>
+        // Create favicon link element
+        const faviconLink = document.createElement('link');
+        faviconLink.rel = 'icon';
+        faviconLink.type = 'image/svg+xml';
+        faviconLink.href = 'data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNjQgNjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPCEtLSBCYWNrZ3JvdW5kIHdpdGggbW9kZXJuIGdyYWRpZW50IC0tPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJiZ0dyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzBGMTcyQSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMzEyRTgxIiAvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgCiAgPCEtLSBDbGVhbiBjaXJjdWxhciBiYWNrZ3JvdW5kIC0tPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjMyIiBmaWxsPSJ1cmwoI2JnR3JhZGllbnQpIiAvPgogIAogIDwhLS0gTW9kZXJuIExpZ2h0bmluZyBCb2x0IERlc2lnbiAtLT4KICA8cGF0aCBkPSJNMzIsMTIgTDIyLDMyIEwzMCwzMiBMMjQsNTIgTDQyLDMyIEwzNCwzMiBMNDAsMTIgWiIgCiAgICAgICAgZmlsbD0iIzNCODJGNiIgCiAgICAgICAgc3Ryb2tlPSIjOTNDNUZEIgogICAgICAgIHN0cm9rZS13aWR0aD0iMSIgLz4KPC9zdmc+';
+        document.head.appendChild(faviconLink);
+    </script>
+
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Setup Screen - Initially visible -->
+        <div id="setupScreen" class="flex-grow gradient-bg flex flex-col">
+            <!-- Top Banner -->
+            <div class="w-full py-6 flex justify-center">
+                <svg width="900" height="120" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-4xl">
+                    <!-- Clean, modern background with gradient -->
+                    <defs>
+                        <linearGradient id="bannerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#030712" />
+                            <stop offset="50%" stop-color="#1E293B" />
+                            <stop offset="100%" stop-color="#312E81" />
+                        </linearGradient>
+                        
+                        <filter id="subtleGlow" x="-10%" y="-10%" width="120%" height="120%">
+                            <feGaussianBlur stdDeviation="4" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                        
+                        <clipPath id="roundedRect">
+                            <rect x="0" y="0" width="1200" height="400" rx="8" ry="8" />
+                        </clipPath>
+                    </defs>
+                    
+                    <!-- Main Background with subtle texture -->
+                    <rect x="0" y="0" width="1200" height="400" fill="url(#bannerGradient)" clip-path="url(#roundedRect)" />
+                    
+                    <!-- Subtle grid for depth -->
+                    <g opacity="0.07">
+                        <line x1="0" y1="100" x2="1200" y2="100" stroke="white" stroke-width="1" />
+                        <line x1="0" y1="200" x2="1200" y2="200" stroke="white" stroke-width="1" />
+                        <line x1="0" y1="300" x2="1200" y2="300" stroke="white" stroke-width="1" />
+                        
+                        <line x1="300" y1="0" x2="300" y2="400" stroke="white" stroke-width="1" />
+                        <line x1="600" y1="0" x2="600" y2="400" stroke="white" stroke-width="1" />
+                        <line x1="900" y1="0" x2="900" y2="400" stroke="white" stroke-width="1" />
+                    </g>
+                    
+                    <!-- Accent graphic elements -->
+                    <circle cx="200" cy="200" r="120" fill="#1E293B" stroke="#3B82F6" stroke-width="2" opacity="0.7" />
+                    <circle cx="200" cy="200" r="90" fill="none" stroke="#6366F1" stroke-width="1" opacity="0.4" />
+                    
+                    <!-- Modern Lightning Bolt -->
+                    <path d="M200,120 L165,190 L195,190 L175,280 L240,190 L210,190 L230,120 Z" 
+                          fill="#3B82F6" 
+                          stroke="#93C5FD"
+                          stroke-width="2"
+                          filter="url(#subtleGlow)" />
+                    
+                    <!-- Subtle accent lines -->
+                    <path d="M350,50 L360,70 L375,60 L390,90" stroke="#3B82F6" stroke-width="1.5" opacity="0.4" fill="none" />
+                    <path d="M970,330 L990,300 L1005,310 L1025,280" stroke="#3B82F6" stroke-width="1.5" opacity="0.4" fill="none" />
+                    
+                    <!-- Clean Typography - Main Title -->
+                    <text x="700" y="180" 
+                          font-family="Arial, sans-serif" 
+                          font-weight="900" 
+                          font-size="82" 
+                          text-anchor="middle" 
+                          fill="white">FOKUSBLIKSEM</text>
+                    
+                    <!-- Tagline with proper spacing -->
+                    <text x="700" y="240" 
+                          font-family="Arial, sans-serif" 
+                          font-weight="400"
+                          font-size="28" 
+                          letter-spacing="1"
+                          text-anchor="middle" 
+                          fill="#93C5FD">Weerligfokus vir jou produktiwiteit</text>
+                    
+                    <!-- Call to Action with proper hierarchy -->
+                    <text x="700" y="310" 
+                          font-family="Arial, sans-serif" 
+                          font-weight="600"
+                          font-size="22" 
+                          text-anchor="middle" 
+                          fill="white">Kry gefokus. Bly produktief. Tref met presisie.</text>
+                </svg>
+            </div>
+            
+            <!-- Initial Get Started Screen -->
+            <div id="initialScreen" class="flex-grow flex flex-col items-center justify-center">
+                <div class="relative mb-8">
+                    <div class="absolute inset-0 rounded-full bg-blue-500 blur-xl opacity-30 animate-pulse-slow"></div>
+                    <button id="getStartedBtn" class="relative flex items-center justify-center px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-2xl font-bold shadow-lg shadow-indigo-500/30 transition transform hover:scale-105 hover:shadow-indigo-500/50 lightning-btn">
+                        <svg class="h-6 w-6 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        GET FOCUSED
+                    </button>
+                </div>
+                
+                <div class="max-w-md text-center text-blue-200 space-y-4">
+                    <p>Click to create your personalized focus blocks and begin your productivity journey.</p>
+                    <div class="flex justify-center space-x-8 pt-4">
+                        <div class="flex flex-col items-center">
+                            <svg class="h-8 w-8 text-yellow-400 mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <p>Enhanced Focus</p>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <svg class="h-8 w-8 text-green-400 mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <p>Time Optimization</p>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <svg class="h-8 w-8 text-purple-400 mb-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <p>Goal Achievement</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Setup Form -->
+            <div id="setupForm" class="flex-grow px-4 py-6 hidden">
+                <div class="max-w-4xl mx-auto card rounded-xl p-6">
+                    <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                        <svg class="h-6 w-6 text-yellow-400 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Create Your Focus Plan
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-blue-200 mb-2">Task Name</label>
+                                <input
+                                    type="text"
+                                    id="newTask"
+                                    placeholder="What will you focus on?"
+                                    class="w-full p-3 bg-gray-800 border border-blue-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-blue-200 mb-2">Start Time</label>
+                                    <input
+                                        type="text"
+                                        id="newStartTime"
+                                        placeholder="8:00 PM"
+                                        class="w-full p-3 bg-gray-800 border border-blue-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                </div>
+                                <div>
+                                    <label class="block text-blue-200 mb-2">End Time</label>
+                                    <input
+                                        type="text"
+                                        id="newEndTime"
+                                        placeholder="9:00 PM"
+                                        class="w-full p-3 bg-gray-800 border border-blue-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-blue-200 mb-2">Notes (Optional)</label>
+                            <textarea
+                                id="newNotes"
+                                placeholder="What do you want to accomplish in this block?"
+                                class="w-full p-3 bg-gray-800 border border-blue-700 rounded-lg text-white h-20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            ></textarea>
+                        </div>
+                        
+                        <div class="flex justify-end">
+                            <button
+                                id="addBlockBtn"
+                                class="flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg text-white transition transform hover:scale-105 lightning-btn"
+                            >
+                                <svg class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Add Block
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Task List -->
+                    <div id="setupTaskList" class="mt-8 hidden">
+                        <h3 class="text-xl font-semibold text-white mb-4">Your Focus Blocks</h3>
+                        <div id="setupTasks" class="space-y-3 max-h-64 overflow-y-auto pr-2">
+                            <!-- Tasks will be added here dynamically -->
+                        </div>
+                        
+                        <div class="mt-6 flex justify-center">
+                            <button
+                                id="finalizeSetupBtn"
+                                class="flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg text-white font-bold shadow-lg shadow-green-500/30 transition transform hover:scale-105 lightning-btn"
+                            >
+                                <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M17 21V13H7V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M7 3V8H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Save & Start Focus Session
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timer Screen - Initially hidden -->
+        <div id="timerScreen" class="min-h-screen gradient-bg py-4 px-4 hidden">
+            <div class="max-w-4xl mx-auto">
+                <!-- Timer Display -->
+                <div class="card rounded-xl p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <svg class="h-8 w-8 text-blue-400 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <h1 class="text-2xl font-bold text-white">FokusBliksem</h1>
+                        </div>
+                        <p class="text-indigo-300">Lightning Focus for Productivity</p>
+                    </div>
+                    
+                    <div class="bg-gray-900 bg-opacity-70 rounded-xl p-6 mb-6 border border-indigo-900">
+                        <div class="flex items-center justify-center space-x-4 mb-4">
+                            <div class="relative">
+                                <div class="absolute inset-0 rounded-full bg-blue-500 blur-md opacity-30 animate-pulse-slow"></div>
+                                <svg class="h-12 w-12 text-blue-400 relative" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div id="timerDisplay" class="text-5xl font-mono font-bold text-white timer-text">
+                                00:00
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mb-6">
+                            <div id="currentTaskInfo" class="hidden">
+                                <h2 id="currentTaskName" class="text-2xl font-semibold text-white"></h2>
+                                <p id="currentTaskTime" class="text-indigo-300"></p>
+                                <p id="currentTaskNotes" class="text-gray-400 italic mt-1"></p>
+                            </div>
+                            <div id="noTaskSelected" class="text-indigo-300">
+                                Select a task block to begin
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-center space-x-4">
+                            <button 
+                                id="toggleTimerBtn"
+                                class="flex items-center px-6 py-3 rounded-lg bg-gray-700 cursor-not-allowed text-white font-bold disabled-btn"
+                                disabled
+                            >
+                                <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 3L19 12L5 21V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Start
+                            </button>
+                            
+                            <button 
+                                id="resetTimerBtn"
+                                class="flex items-center px-6 py-3 rounded-lg bg-gray-700 cursor-not-allowed text-white font-bold disabled-btn"
+                                disabled
+                            >
+                                <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M23 4V10H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M1 20V14H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M3.51 9.00004C4.01717 7.56689 4.87913 6.28548 6.01547 5.27549C7.1518 4.2655 8.52547 3.55985 10.0083 3.22433C11.4911 2.8888 13.0348 2.93442 14.4952 3.35685C15.9556 3.77928 17.2853 4.56479 18.36 5.64004L23 10M1 14L5.64 18.36C6.71475 19.4353 8.04437 20.2208 9.50481 20.6432C10.9652 21.0657 12.5089 21.1113 13.9917 20.7758C15.4745 20.4402 16.8482 19.7346 17.9845 18.7246C19.1209 17.7146 19.9828 16.4332 20.49 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Reset
+                            </button>
+                            
+                            <button 
+                                id="completeTaskBtn"
+                                class="flex items-center px-6 py-3 rounded-lg bg-gray-700 cursor-not-allowed text-white font-bold disabled-btn"
+                                disabled
+                            >
+                                <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Complete
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Notes Section -->
+                    <div id="notesSection" class="mb-6 hidden">
+                        <h3 class="text-lg font-semibold text-white mb-2">Session Notes</h3>
+                        <textarea
+                            id="sessionNotes"
+                            placeholder="Add your progress notes here..."
+                            class="w-full p-3 bg-gray-800 border border-indigo-700 rounded-lg text-white h-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        ></textarea>
+                    </div>
+                </div>
+                
+                <!-- Schedule Blocks -->
+                <div class="card rounded-xl p-6 mb-6">
+                    <h2 class="text-xl font-semibold text-white mb-4">Your Focus Blocks</h2>
+                    <div id="scheduleBlocks" class="space-y-3">
+                        <!-- Focus blocks will be added here dynamically -->
+                    </div>
+                    
+                    <!-- Reset All Button -->
+                    <div class="mt-6 text-center">
+                        <button 
+                            id="resetAllBtn"
+                            class="flex items-center px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-lg transition transform hover:scale-105 mx-auto font-bold shadow-lg lightning-btn"
+                        >
+                            <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 8V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Reset & Create New Plan
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Progress Summary -->
+                <div class="card rounded-xl p-6">
+                    <h2 class="text-xl font-semibold text-white mb-4">Session Progress</h2>
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-2 text-white">
+                            <span>Completed Tasks</span>
+                            <span id="progressCounter">0 / 0</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-3">
+                            <div 
+                                id="progressBar"
+                                class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio for notifications -->
+    <audio id="timerCompleteSound" preload="auto">
+        <source src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAASAAAeMwAUFBQUFCgUFBQUFBQ8PDw8PDxQPDw8PDw8ZGRkZGRkeFhkZGRkZGSMjIyMjIygnJycnJycvLy8vLy80NDQ0NDQ0Ozs7Ozs7Pz8/Pz8/P///////////////8TAAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAYBAAAAAAAAHjOsGAn+//tAxAAAAoEXepUAAAIgQd7KVQAEiAtQAGCRAANALmhvdPocAAAAzBEAAAACAZoGYIMAEAQBAQIAAAAUikYBJAEJGtSKhhA4MHf//xgEPQQAAAoADjf//k3UBAMnf/BwMf/TADgQPgAAIAMO8HZNkHlTCXKB4AIhMnP//EBx//yEGxQI4MWD/1SYXcJBUKEIyeiIGBTH/+IgQEAQdCJn/5D2EkVNzIFB8VBESUhP//YLYwD0BCwLMh//JVlcI8VJFhQWGYxWJ//+s5NjTMQnKwSEAQv/+U4oaSJGZmRmKCxKr/+RlVEj1ChhSWuUih///rKpJCohpEgqKioqKnRUVFRUVP/7QsQDgAe8e3/9BAABAlN68yNYCFL////THR0VFRUUAABAIAABAABQAFBQUFMOal8LAgICAkA3NT47YMDAwMDBMU9MTEyMjAwMDEhISEjIyFBQUFBQWHh4eHiQeHh4eHh4wMDAwMDg4ODg4ODg//////////////////+AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA" type="audio/mp3">
+    </audio>
+
+    <script>
+        // Main app state
+        const appState = {
+            setup: {
+                tasks: [],
+                nextId: 1
+            },
+            timer: {
+                currentBlock: null,
+                timeRemaining: 0,
+                isRunning: false,
+                timerStartTime: null,
+                interval: null
+            },
+            notes: {},
+            completedTasks: []
+        };
+
+        // DOM Elements
+        const elements = {
+            // Setup screens
+            setupScreen: document.getElementById('setupScreen'),
+            initialScreen: document.getElementById('initialScreen'),
+            setupForm: document.getElementById('setupForm'),
+            getStartedBtn: document.getElementById('getStartedBtn'),
+            
+            // Setup form
+            newTask: document.getElementById('newTask'),
+            newStartTime: document.getElementById('newStartTime'),
+            newEndTime: document.getElementById('newEndTime'),
+            newNotes: document.getElementById('newNotes'),
+            addBlockBtn: document.getElementById('addBlockBtn'),
+            setupTaskList: document.getElementById('setupTaskList'),
+            setupTasks: document.getElementById('setupTasks'),
+            finalizeSetupBtn: document.getElementById('finalizeSetupBtn'),
+            
+            // Timer screen
+            timerScreen: document.getElementById('timerScreen'),
+            timerDisplay: document.getElementById('timerDisplay'),
+            currentTaskInfo: document.getElementById('currentTaskInfo'),
+            noTaskSelected: document.getElementById('noTaskSelected'),
+            currentTaskName: document.getElementById('currentTaskName'),
+            currentTaskTime: document.getElementById('currentTaskTime'),
+            currentTaskNotes: document.getElementById('currentTaskNotes'),
+            toggleTimerBtn: document.getElementById('toggleTimerBtn'),
+            resetTimerBtn: document.getElementById('resetTimerBtn'),
+            completeTaskBtn: document.getElementById('completeTaskBtn'),
+            
+            // Notes
+            notesSection: document.getElementById('notesSection'),
+            sessionNotes: document.getElementById('sessionNotes'),
+            
+            // Task blocks and progress
+            scheduleBlocks: document.getElementById('scheduleBlocks'),
+            resetAllBtn: document.getElementById('resetAllBtn'),
+            progressCounter: document.getElementById('progressCounter'),
+            progressBar: document.getElementById('progressBar'),
+            
+            // Sound
+            timerCompleteSound: document.getElementById('timerCompleteSound')
+        };
+
+        // Event listeners
+        elements.getStartedBtn.addEventListener('click', () => {
+            elements.initialScreen.classList.add('hidden');
+            elements.setupForm.classList.remove('hidden');
+        });
+
+        elements.addBlockBtn.addEventListener('click', addSetupTask);
+        elements.finalizeSetupBtn.addEventListener('click', finalizeSetup);
+        elements.resetAllBtn.addEventListener('click', resetAll);
+        elements.toggleTimerBtn.addEventListener('click', toggleTimer);
+        elements.resetTimerBtn.addEventListener('click', resetTimer);
+        elements.completeTaskBtn.addEventListener('click', completeCurrentTask);
+
+        // Function to calculate block duration in minutes
+        function getBlockDuration(timeRange) {
+            const [start, end] = timeRange.split('–').map(t => t.trim());
+            
+            // Parse times, handling AM/PM correctly
+            const parseTime = (timeStr) => {
+                const [hourMin, period] = timeStr.split(' ');
+                let [hours, minutes] = hourMin.split(':').map(Number);
+                
+                if (period === 'PM' && hours < 12) hours += 12;
+                if (period === 'AM' && hours === 12) hours = 0;
+                
+                return hours * 60 + minutes;
+            };
+            
+            const startMinutes = parseTime(start);
+            let endMinutes = parseTime(end);
+            
+            // Handle cases where the end time is after midnight
+            if (endMinutes < startMinutes) {
+                endMinutes += 24 * 60;
+            }
+            
+            return endMinutes - startMinutes;
+        }
+
+        // Function to format seconds as MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Function to add a task to the setup list
+        function addSetupTask() {
+            const task = elements.newTask.value.trim();
+            const startTime = elements.newStartTime.value.trim();
+            const endTime = elements.newEndTime.value.trim();
+            const notes = elements.newNotes.value.trim();
+            
+            if (!task || !startTime || !endTime) {
+                alert("Please fill in the task name, start time, and end time.");
+                return;
+            }
+            
+            const newTask = {
+                id: appState.setup.nextId++,
+                task: task,
+                time: `${startTime} – ${endTime}`,
+                notes: notes,
+                isActive: false,
+                isComplete: false
+            };
+            
+            appState.setup.tasks.push(newTask);
+            
+            // Show task list if it's hidden
+            elements.setupTaskList.classList.remove('hidden');
+            
+            // Add task to the UI
+            renderSetupTasks();
+            
+            // Clear form
+            elements.newTask.value = '';
+            elements.newStartTime.value = '';
+            elements.newEndTime.value = '';
+            elements.newNotes.value = '';
+            
+            // Focus back on task input
+            elements.newTask.focus();
+        }
+
+        // Function to render setup tasks
+        function renderSetupTasks() {
+            elements.setupTasks.innerHTML = '';
+            
+            appState.setup.tasks.forEach(task => {
+                const taskEl = document.createElement('div');
+                taskEl.className = 'p-4 rounded-lg border border-blue-700 bg-gray-800 bg-opacity-50 flex justify-between items-center';
+                taskEl.innerHTML = `
+                    <div>
+                        <h4 class="font-semibold text-white">${task.task}</h4>
+                        <p class="text-sm text-blue-300">${task.time}</p>
+                        ${task.notes ? `<p class="text-xs text-gray-400 mt-1">${task.notes}</p>` : ''}
+                    </div>
+                    <button data-id="${task.id}" class="remove-task-btn text-red-400 hover:text-red-300">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                `;
+                elements.setupTasks.appendChild(taskEl);
+            });
+            
+            // Add remove event listeners
+            document.querySelectorAll('.remove-task-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.dataset.id);
+                    removeSetupTask(id);
+                });
+            });
+        }
+
+        // Function to remove a setup task
+        function removeSetupTask(id) {
+            appState.setup.tasks = appState.setup.tasks.filter(task => task.id !== id);
+            renderSetupTasks();
+            
+            // Hide task list if empty
+            if (appState.setup.tasks.length === 0) {
+                elements.setupTaskList.classList.add('hidden');
+            }
+        }
+
+        // Function to finalize setup and start the timer
+        function finalizeSetup() {
+            if (appState.setup.tasks.length === 0) {
+                alert("Please add at least one focus block.");
+                return;
+            }
+            
+            // Hide setup screen and show timer screen
+            elements.setupScreen.classList.add('hidden');
+            elements.timerScreen.classList.remove('hidden');
+            
+            // Render the schedule blocks
+            renderScheduleBlocks();
+            
+            // Update progress display
+            updateProgressDisplay();
+        }
+
+        // Function to render schedule blocks
+        function renderScheduleBlocks() {
+            elements.scheduleBlocks.innerHTML = '';
+            
+            appState.setup.tasks.forEach(block => {
+                const blockEl = document.createElement('div');
+                blockEl.className = `p-4 rounded-lg border focus-block ${
+                    block.isComplete 
+                        ? 'bg-green-900 bg-opacity-20 border-green-700' 
+                        : block.isActive
+                            ? 'bg-blue-900 bg-opacity-20 border-blue-700 glow'
+                            : 'bg-gray-800 border-gray-700 hover:bg-gray-700'
+                } transition cursor-pointer`;
+                blockEl.dataset.id = block.id;
+                
+                blockEl.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-semibold text-white">${block.task}</h3>
+                            <p class="text-sm text-indigo-300">${block.time}</p>
+                        </div>
+                        <div>
+                            ${block.isComplete 
+                                ? `<svg class="h-6 w-6 text-green-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>` 
+                                : block.isActive 
+                                    ? `<svg class="h-6 w-6 text-blue-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>` 
+                                    : `<svg class="h-6 w-6 text-gray-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 3L19 12L5 21V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>`
+                            }
+                        </div>
+                    </div>
+                    
+                    ${appState.notes[block.id] 
+                        ? `<div class="mt-2 p-2 bg-gray-700 rounded text-sm">
+                            <p class="text-gray-300">${appState.notes[block.id]}</p>
+                        </div>` 
+                        : ''
+                    }
+                `;
+                
+                // Add click event if not complete
+                if (!block.isComplete) {
+                    blockEl.addEventListener('click', () => startBlock(block.id));
+                }
+                
+                elements.scheduleBlocks.appendChild(blockEl);
+            });
+        }
+
+        // Function to start a specific block
+        function startBlock(blockId) {
+            const block = appState.setup.tasks.find(b => b.id === blockId);
+            if (!block) return;
+            
+            // Reset all blocks to inactive
+            appState.setup.tasks = appState.setup.tasks.map(b => ({
+                ...b,
+                isActive: b.id === blockId
+            }));
+            
+            // Calculate duration in minutes and convert to seconds
+            const durationMinutes = getBlockDuration(block.time);
+            const durationSeconds = durationMinutes * 60;
+            
+            // Update the timer state
+            appState.timer.currentBlock = blockId;
+            appState.timer.timeRemaining = durationSeconds;
+            appState.timer.isRunning = false;
+            appState.timer.timerStartTime = null;
+            
+            // Update UI
+            renderScheduleBlocks();
+            updateTimerDisplay();
+            
+            // Enable buttons
+            enableTimerControls();
+            
+            // Show task info
+            elements.currentTaskInfo.classList.remove('hidden');
+            elements.noTaskSelected.classList.add('hidden');
+            elements.currentTaskName.textContent = block.task;
+            elements.currentTaskTime.textContent = block.time;
+            elements.currentTaskNotes.textContent = block.notes || '';
+            
+            // Show notes section
+            elements.notesSection.classList.remove('hidden');
+            elements.sessionNotes.value = appState.notes[blockId] || '';
+            
+            // Focus on notes textarea
+            elements.sessionNotes.focus();
+        }
+
+        // Function to toggle timer running state
+        function toggleTimer() {
+            if (!appState.timer.currentBlock) return;
+            
+            if (appState.timer.isRunning) {
+                // Pause the timer
+                clearInterval(appState.timer.interval);
+                appState.timer.isRunning = false;
+                
+                // Update button
+                elements.toggleTimerBtn.innerHTML = `
+                    <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 3L19 12L5 21V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Start
+                `;
+                elements.toggleTimerBtn.classList.remove('from-yellow-500', 'to-amber-600');
+                elements.toggleTimerBtn.classList.add('from-green-500', 'to-emerald-600');
+            } else {
+                // Start the timer
+                const now = Date.now();
+                const elapsedSeconds = appState.timer.timerStartTime 
+                    ? Math.floor((now - appState.timer.timerStartTime) / 1000) 
+                    : 0;
+                
+                appState.timer.timerStartTime = now - (elapsedSeconds * 1000);
+                appState.timer.isRunning = true;
+                
+                // Update timer every second
+                appState.timer.interval = setInterval(updateTimerTime, 1000);
+                
+                // Update button
+                elements.toggleTimerBtn.innerHTML = `
+                    <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="6" y="4" width="4" height="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="14" y="4" width="4" height="16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Pause
+                `;
+                elements.toggleTimerBtn.classList.remove('from-green-500', 'to-emerald-600');
+                elements.toggleTimerBtn.classList.add('from-yellow-500', 'to-amber-600');
+            }
+        }
+
+        // Function to update timer time
+        function updateTimerTime() {
+            if (!appState.timer.isRunning || !appState.timer.currentBlock) return;
+            
+            const now = Date.now();
+            const elapsedSeconds = Math.floor((now - appState.timer.timerStartTime) / 1000);
+            
+            const block = appState.setup.tasks.find(b => b.id === appState.timer.currentBlock);
+            const blockDuration = getBlockDuration(block.time) * 60;
+            const remaining = blockDuration - elapsedSeconds;
+            
+            if (remaining <= 0) {
+                // Time's up!
+                appState.timer.timeRemaining = 0;
+                appState.timer.isRunning = false;
+                clearInterval(appState.timer.interval);
+                
+                // Play notification sound
+                elements.timerCompleteSound.play().catch(e => console.error("Error playing sound:", e));
+                
+                // Update UI
+                updateTimerDisplay();
+                
+                // Reset button
+                elements.toggleTimerBtn.innerHTML = `
+                    <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 3L19 12L5 21V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Start
+                `;
+                elements.toggleTimerBtn.classList.remove('from-yellow-500', 'to-amber-600');
+                elements.toggleTimerBtn.classList.add('from-green-500', 'to-emerald-600');
+            } else {
+                appState.timer.timeRemaining = remaining;
+                updateTimerDisplay();
+            }
+        }
+
+        // Function to update timer display
+        function updateTimerDisplay() {
+            elements.timerDisplay.textContent = formatTime(appState.timer.timeRemaining);
+        }
+
+        // Function to reset the timer
+        function resetTimer() {
+            if (!appState.timer.currentBlock) return;
+            
+            // Stop the timer if it's running
+            if (appState.timer.isRunning) {
+                clearInterval(appState.timer.interval);
+                appState.timer.isRunning = false;
+            }
+            
+            // Reset timer state
+            const block = appState.setup.tasks.find(b => b.id === appState.timer.currentBlock);
+            const durationMinutes = getBlockDuration(block.time);
+            appState.timer.timeRemaining = durationMinutes * 60;
+            appState.timer.timerStartTime = null;
+            
+            // Update UI
+            updateTimerDisplay();
+            
+            // Update button
+            elements.toggleTimerBtn.innerHTML = `
+                <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 3L19 12L5 21V3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Start
+            `;
+            elements.toggleTimerBtn.classList.remove('from-yellow-500', 'to-amber-600');
+            elements.toggleTimerBtn.classList.add('from-green-500', 'to-emerald-600');
+        }
+
+        // Function to complete the current task
+        function completeCurrentTask() {
+            if (!appState.timer.currentBlock) return;
+            
+            // Save notes for this block
+            const notes = elements.sessionNotes.value.trim();
+            if (notes) {
+                appState.notes[appState.timer.currentBlock] = notes;
+            }
+            
+            // Mark task as complete
+            appState.setup.tasks = appState.setup.tasks.map(b => ({
+                ...b,
+                isComplete: b.id === appState.timer.currentBlock ? true : b.isComplete,
+                isActive: b.id === appState.timer.currentBlock ? false : b.isActive
+            }));
+            
+            // Add to completed tasks
+            appState.completedTasks.push(appState.timer.currentBlock);
+            
+            // Stop the timer if it's running
+            if (appState.timer.isRunning) {
+                clearInterval(appState.timer.interval);
+            }
+            
+            // Reset timer state
+            appState.timer.currentBlock = null;
+            appState.timer.timeRemaining = 0;
+            appState.timer.isRunning = false;
+            appState.timer.timerStartTime = null;
+            
+            // Update UI
+            renderScheduleBlocks();
+            updateTimerDisplay();
+            
+            // Hide task info
+            elements.currentTaskInfo.classList.add('hidden');
+            elements.noTaskSelected.classList.remove('hidden');
+            
+            // Hide notes section
+            elements.notesSection.classList.add('hidden');
+            elements.sessionNotes.value = '';
+            
+            // Disable buttons
+            disableTimerControls();
+            
+            // Update progress
+            updateProgressDisplay();
+        }
+
+        // Function to update progress display
+        function updateProgressDisplay() {
+            const totalTasks = appState.setup.tasks.length;
+            const completedTasks = appState.completedTasks.length;
+            const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+            
+            elements.progressCounter.textContent = `${completedTasks} / ${totalTasks}`;
+            elements.progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        // Function to enable timer controls
+        function enableTimerControls() {
+            elements.toggleTimerBtn.disabled = false;
+            elements.resetTimerBtn.disabled = false;
+            elements.completeTaskBtn.disabled = false;
+            
+            elements.toggleTimerBtn.classList.remove('bg-gray-700', 'cursor-not-allowed', 'disabled-btn');
+            elements.resetTimerBtn.classList.remove('bg-gray-700', 'cursor-not-allowed', 'disabled-btn');
+            elements.completeTaskBtn.classList.remove('bg-gray-700', 'cursor-not-allowed', 'disabled-btn');
+            
+            elements.toggleTimerBtn.classList.add('bg-gradient-to-r', 'from-green-500', 'to-emerald-600', 'hover:from-green-600', 'hover:to-emerald-700', 'lightning-btn');
+            elements.resetTimerBtn.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600', 'hover:from-blue-600', 'hover:to-indigo-700', 'lightning-btn');
+            elements.completeTaskBtn.classList.add('bg-gradient-to-r', 'from-purple-500', 'to-violet-600', 'hover:from-purple-600', 'hover:to-violet-700', 'lightning-btn');
+        }
+
+        // Function to disable timer controls
+        function disableTimerControls() {
+            elements.toggleTimerBtn.disabled = true;
+            elements.resetTimerBtn.disabled = true;
+            elements.completeTaskBtn.disabled = true;
+            
+            elements.toggleTimerBtn.classList.remove('bg-gradient-to-r', 'from-green-500', 'to-emerald-600', 'hover:from-green-600', 'hover:to-emerald-700', 'lightning-btn', 'from-yellow-500', 'to-amber-600', 'hover:from-yellow-600', 'hover:to-amber-700');
+            elements.resetTimerBtn.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600', 'hover:from-blue-600', 'hover:to-indigo-700', 'lightning-btn');
+            elements.completeTaskBtn.classList.remove('bg-gradient-to-r', 'from-purple-500', 'to-violet-600', 'hover:from-purple-600', 'hover:to-violet-700', 'lightning-btn');
+            
+            elements.toggleTimerBtn.classList.add('bg-gray-700', 'cursor-not-allowed', 'disabled-btn');
+            elements.resetTimerBtn.classList.add('bg-gray-700', 'cursor-not-allowed', 'disabled-btn');
+            elements.completeTaskBtn.classList.add('bg-gray-700', 'cursor-not-allowed', 'disabled-btn');
+        }
+
+        // Function to reset everything
+        function resetAll() {
+            // Reset app state
+            appState.setup.tasks = [];
+            appState.timer.currentBlock = null;
+            appState.timer.timeRemaining = 0;
+            appState.timer.isRunning = false;
+            appState.timer.timerStartTime = null;
